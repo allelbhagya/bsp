@@ -15,7 +15,14 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = 'ANSAKLDkjdnwkj';
 
-app.use(cors({credentials: true, origin:'http://localhost:3000'}));
+app.use(cors(
+  {
+    origin: ["https://bsp-api-pink.vercel.app/"],
+    methods: ['POST', 'GET'],
+    credentials: true,
+  }
+))
+
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname+'/uploads'));
