@@ -1,5 +1,6 @@
 {
-  "short_name": "cobble",
+  "short_name": "Cobble logs",
+  "name": "Cobble logs",
   "icons": [
     {
       "src": "favicon.ico",
