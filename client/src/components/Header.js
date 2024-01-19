@@ -6,9 +6,12 @@ import Cookies from 'js-cookie';
 export default function Header(){
     const {setUserInfo, userInfo} = useContext(UserContext);
     useEffect(() => {
+      console.log('useEffect triggered');
+  
       const token = Cookies.get('token');
   
       if (!token) {
+          console.log('No token found');
           return;
       }
   
@@ -16,12 +19,16 @@ export default function Header(){
           credentials: 'include',
       })
       .then(response => response.json())
-      .then(userInfo => setUserInfo(userInfo))
+      .then(userInfo => {
+          console.log('Profile data:', userInfo);
+          setUserInfo(userInfo);
+      })
       .catch(error => {
           console.error('Error fetching profile:', error);
           // Handle the error as needed
       });
   }, []);
+  
 
     function logout(){
         fetch("https://t-bsp-api.vercel.app/logout", {
