@@ -21,7 +21,7 @@ app.use(cors({
     credentials: true,
     origin: allowedOrigins,
   }));
-  
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -87,8 +87,11 @@ app.post('/logout', (req,res)=>{
 
 app.post('/log', upload.none(), async(req, res) => {
     const {token} = req.cookies;
-    jwt.verify(token, secret, {}, async(err, info)=>{
-        if(err) throw err;
+
+    jwt.verify(token, secret, {}, async(err, info) => {
+        if (err) {
+            return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+        }
 
         const {createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
         const logCreatedAt = createdAt || new Date().toISOString();
