@@ -6,24 +6,31 @@ export default function Header() {
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
-    fetch('https://t-bsp-api.vercel.app/profile', {
-      credentials: 'include',
-    })
-      .then((response) => response.json())
-      .then((userInfo) => {
-        setUserInfo(userInfo);
-      })
-      .catch((error) => {
-        console.error('Failed to fetch user profile:', error);
+    fetchProfile();
+  }, [userInfo]); // Add userInfo as a dependency
+
+  async function fetchProfile() {
+    try {
+      const response = await fetch('https://t-bsp-api.vercel.app/profile', {
+        credentials: 'include',
       });
-  }, []); // Empty dependency array means it runs once after mounting
-  
+
+      if (response.ok) {
+        const userInfo = await response.json();
+        setUserInfo(userInfo);
+      } else {
+        console.error('Failed to fetch user profile:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error during profile:', error);
+    }
+  }
 
   function logout() {
     fetch("https://t-bsp-api.vercel.app/logout", {
       credentials: 'include',
       method: 'POST',
-    });
+    })
     setUserInfo(null);
   }
 
@@ -31,21 +38,35 @@ export default function Header() {
 
   return (
     <header>
-      <Link to="/" className="logo">cobble logs</Link>
+      <Link to="/" className="logo">
+        cobble logs
+      </Link>
       <nav>
         {username && (
           <>
             <h2>Hi! {username}</h2>
-            <Link to="/analysis" className="nav-button">Analysis</Link>
-            <Link to="/create" className="nav-button">Create new log</Link>
-            <Link onClick={logout} className="nav-button">Logout</Link>
+            <Link to="/analysis" className="nav-button">
+              Analysis
+            </Link>
+            <Link to="/create" className="nav-button">
+              Create new log
+            </Link>
+            <Link onClick={logout} className="nav-button">
+              Logout
+            </Link>
           </>
         )}
         {!username && (
           <>
-            <Link to="/analysis" className="nav-button">Analysis</Link>
-            <Link to="/login" className="nav-button">Login</Link>
-            <Link to="/register" className="nav-button">Register</Link>
+            <Link to="/analysis" className="nav-button">
+              Analysis
+            </Link>
+            <Link to="/login" className="nav-button">
+              Login
+            </Link>
+            <Link to="/register" className="nav-button">
+              Register
+            </Link>
           </>
         )}
       </nav>
