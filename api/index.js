@@ -52,23 +52,28 @@ app.post('/register', async(req,res)=>{
 })
 
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const userDoc = await User.findOne({ username });
-    const passOk = bcrypt.compareSync(password, userDoc.password);
-    if (passOk) {
+  const { username, password } = req.body;
+  const userDoc = await User.findOne({ username });
+  const passOk = bcrypt.compareSync(password, userDoc.password);
+
+  if (passOk) {
       // logged in
       jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
-        if (err) throw err;
-        res.cookie('token', token, { httpOnly: true }).json({
-          id: userDoc._id,
-          username,
-        });
-        console.log('Token set:', token);
+          if (err) throw err;
+          // Return user profile information along with the token
+          res.cookie('token', token, { httpOnly: true }).json({
+              id: userDoc._id,
+              username,
+              // Include any additional profile information you want to return
+              // For example, email: userDoc.email
+          });
+          console.log('Token set:', token);
       });
-    } else {
+  } else {
       res.status(400).json('wrong credentials');
-    }
-  });
+  }
+});
+
 
 
   app.get('/profile', async (req, res) => {
