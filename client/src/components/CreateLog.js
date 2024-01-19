@@ -110,11 +110,8 @@ export default function CreateLog() {
     data.set('comment', comms);
     data.set('measure', mea);
     ev.preventDefault();
-    const response = await fetch('https://t-bsp-api.vercel.app/log', {
+    const response = await fetch('http://localhost:4000/log', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-    },
       body: data,
       credentials: 'include',
     });

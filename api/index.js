@@ -14,13 +14,7 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
-app.use(cors({
-  methods: ["POST", "GET", "DELETE", "PUT"],
-  credentials: true,
-  origin: ["https://t-bsp-client.vercel.app", "https://bspweb-client-ci1pzi87s-allelbhagya.vercel.app"],
-}));
-
-
+app.use(cors({credentials:true,origin:'https://t-bsp-client.vercel.app'}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -38,19 +32,23 @@ app.post('/register', async(req,res)=>{
     } 
 })
 
+app.get("/", (req, res) => {
+  res.json("ok works");
+});
+
+
 app.post('/login', async (req,res) => {
     const {username,password} = req.body;
     const userDoc = await User.findOne({username});
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
-      // logged in
-      jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+      jwt.sign({username,id:userDoc._id}, secret, {}, (err,token) => {
         if (err) throw err;
-        res.cookie('token', token, { httpOnly: true }).json({
-          id: userDoc._id,
+        res.cookie('token', token).json({
+          id:userDoc._id,
           username,
-        });        
-      });      
+        });
+      });
     } else {
       res.status(400).json('wrong credentials');
     }
@@ -58,23 +56,22 @@ app.post('/login', async (req,res) => {
 
   app.get('/profile', async (req, res) => {
     try {
-      const { token } = req.cookies;
+        const { token } = req.cookies;
 
-      console.log('Received token:', token);  // Add this line for debugging
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized - No token found' });
+        }
 
-      if (!token) {
-        return res.status(401).json({ error: 'Unauthorized - No token found' });
-      }
+        const info = await jwt.verify(token, secret);
 
-      const info = await jwt.verify(token, secret);
-      console.log('User profile info:', info); // Add this line for debugging
-
-      res.json(info);
+        res.json(info);
     } catch (error) {
-      console.error('Error during profile:', error);
-      res.status(401).json({ error: 'Unauthorized - Invalid token' });
+        console.error('Error during profile:', error);
+        res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
 });
+
+
 
 
 app.post('/logout', (req,res)=>{
