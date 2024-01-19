@@ -14,8 +14,8 @@ export default function LoginPage(){
                 method: 'POST',
                 body: JSON.stringify({ username, password }),
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-            });
+                credentials: 'include', // Ensure you include credentials
+              });              
     
             if (response.ok) {
                 const userInfo = await response.json();
