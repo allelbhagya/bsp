@@ -14,21 +14,11 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
-const allowedOrigins = ['https://t-bsp-client.vercel.app', 'https://bspweb-client-ci1pzi87s-allelbhagya.vercel.app'];
-
 app.use(cors({
   methods: ["POST", "GET", "DELETE", "PUT"],
   credentials: true,
-  origin: function (origin, callback) {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-          callback(null, true);
-      } else {
-          callback(new Error('The CORS policy for this site does not allow access from the specified origin.'));
-      }
-  }
+  origin: ["https://t-bsp-client.vercel.app", "https://bspweb-client-ci1pzi87s-allelbhagya.vercel.app"],
 }));
-
-
 
 
 app.use(express.json());

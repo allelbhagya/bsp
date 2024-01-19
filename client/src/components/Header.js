@@ -9,7 +9,12 @@ export default function Header() {
     fetch('https://t-bsp-api.vercel.app/profile', {
         credentials: 'include',
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(userInfo => {
         console.log('User Profile:', userInfo);
         setUserInfo(userInfo);
@@ -17,8 +22,7 @@ export default function Header() {
     .catch(error => {
         console.error('Error fetching user profile:', error);
     });
-}, []);  // Use an empty dependency array
-
+}, []);
 
 
   function logout() {
