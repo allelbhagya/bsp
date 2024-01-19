@@ -17,7 +17,8 @@ export default function Header() {
     .catch(error => {
         console.error('Error fetching user profile:', error);
     });
-}, []);
+}, [setUserInfo]);  // Add setUserInfo to the dependency array
+
 
 
   function logout() {
