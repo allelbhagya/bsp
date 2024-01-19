@@ -15,6 +15,8 @@ export default function Header(){
           return;
       }
   
+      console.log('Fetching profile...');
+  
       fetch('https://t-bsp-api.vercel.app/profile', {
           credentials: 'include',
       })
