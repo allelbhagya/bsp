@@ -12,32 +12,25 @@ const app = express();
 
 
 const salt = bcrypt.genSaltSync(10);
-const secret = "qddi10eu90ikj1wqmn";
+const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
-const allowedOrigins = ['https://t-bsp-client.vercel.app', 'https://t-bsp-client-r00fzvbb4-allelbhagya.vercel.app'];
+const allowedOrigins = ['https://t-bsp-client.vercel.app', 'https://bspweb-client-ci1pzi87s-allelbhagya.vercel.app'];
 
 app.use(cors({
-    methods: ["POST", "GET", "DELETE", "PUT"],
-    credentials: true,
-    origin: function (origin, callback) {
-      // Check if the origin is in the allowedOrigins array or if it's undefined (e.g., for same-origin requests)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-  }));
-
+    methods: ["POST", "GET", "DELETE", "PUT"], 
+  credentials: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('The CORS policy for this site does not allow access from the specified origin.'));
+    }
+  }
+}));
 app.use(express.json());
 app.use(cookieParser());
 
 mongoose.connect("mongodb+srv://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority");
-
-app.get("/", (req, res) => {
-    res.json("ok works");
-  });
-  
 
 app.post('/register', async(req,res)=>{
     const {username, password} = req.body;
@@ -51,30 +44,23 @@ app.post('/register', async(req,res)=>{
     } 
 })
 
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const userDoc = await User.findOne({ username });
-  const passOk = bcrypt.compareSync(password, userDoc.password);
-
-  if (passOk) {
+app.post('/login', async (req,res) => {
+    const {username,password} = req.body;
+    const userDoc = await User.findOne({username});
+    const passOk = bcrypt.compareSync(password, userDoc.password);
+    if (passOk) {
       // logged in
-      jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
-          if (err) throw err;
-          // Return user profile information along with the token
-          res.cookie('token', token, { httpOnly: true }).json({
-              id: userDoc._id,
-              username,
-              // Include any additional profile information you want to return
-              // For example, email: userDoc.email
-          });
-          console.log('Token set:', token);
+      jwt.sign({username,id:userDoc._id}, secret, {}, (err,token) => {
+        if (err) throw err;
+        res.cookie('token', token).json({
+          id:userDoc._id,
+          username,
+        });
       });
-  } else {
+    } else {
       res.status(400).json('wrong credentials');
-  }
-});
-
-
+    }
+  });
 
   app.get('/profile', async (req, res) => {
     try {
@@ -93,28 +79,37 @@ app.post('/login', async (req, res) => {
     }
 });
 
+
+
+
 app.post('/logout', (req,res)=>{
     res.cookie('token', '').json('ok');
 })
 
-app.post('/log', upload.none(), async (req, res) => {
-  const {token} = req.cookies;
-  jwt.verify(token, secret, {}, async (err,info) => {
-  if (err) throw err;
-  const { time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
-  const logDoc = await Logs.create({
-    time,
-    duration,
-    region,
-    sensorID,
-    stoppage,
-    profile,
-    comment,
-    measure,
-    author: info.id,
-  });
-  res.json(logDoc);
-});});
+app.post('/log', upload.none(), async(req, res) => {
+    const {token} = req.cookies;
+    jwt.verify(token, secret, {}, async(err, info)=>{
+        if(err) throw err;
+
+        const {createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
+        const logCreatedAt = createdAt || new Date().toISOString();
+
+        const logDoc = await Logs.create({
+            createdAt: logCreatedAt,
+            time,
+            duration, 
+            region, 
+            sensorID, 
+            stoppage, 
+            profile, 
+            comment, 
+            measure,
+            author:info.id,
+        });
+
+        res.json(logDoc);
+    });
+});
 
 
 app.get('/log', async(req,res)=>{
