@@ -17,7 +17,7 @@ export default function Header() {
     .catch(error => {
         console.error('Error fetching user profile:', error);
     });
-}, [setUserInfo]);  // Add setUserInfo to the dependency array
+}, []);  // Use an empty dependency array
 
 
 
