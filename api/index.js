@@ -68,22 +68,22 @@ app.post('/login', async (req,res) => {
 
   app.get('/profile', async (req, res) => {
     try {
-        const { token } = req.cookies;
+      const { token } = req.cookies;
   
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized - No token found' });
-        }
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized - No token found' });
+      }
   
-        const info = await jwt.verify(token, secret);
+      const info = await jwt.verify(token, secret);
+      console.log('User profile info:', info); // Add this line for debugging
   
-        console.log('User Info:', info);
-  
-        res.json(info);
+      res.json(info);
     } catch (error) {
-        console.error('Error during profile:', error);
-        res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      console.error('Error during profile:', error);
+      res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
   });
+  
   
 
 
