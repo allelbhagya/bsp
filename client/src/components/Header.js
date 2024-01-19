@@ -6,25 +6,19 @@ export default function Header() {
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
-    fetchProfile();
-  }, [userInfo]); // Add userInfo as a dependency
-
-  async function fetchProfile() {
-    try {
-      const response = await fetch('https://t-bsp-api.vercel.app/profile', {
+    fetch('https://t-bsp-api.vercel.app/profile', {
         credentials: 'include',
-      });
-
-      if (response.ok) {
-        const userInfo = await response.json();
+    })
+    .then(response => response.json())
+    .then(userInfo => {
+        console.log('User Profile:', userInfo);
         setUserInfo(userInfo);
-      } else {
-        console.error('Failed to fetch user profile:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error during profile:', error);
-    }
-  }
+    })
+    .catch(error => {
+        console.error('Error fetching user profile:', error);
+    });
+}, []);
+
 
   function logout() {
     fetch("https://t-bsp-api.vercel.app/logout", {
