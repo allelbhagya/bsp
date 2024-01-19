@@ -1,18 +1,27 @@
 import { useEffect,useContext } from "react";
 import {Link} from "react-router-dom";
 import { UserContext } from "./UserContext";
+import Cookies from 'js-cookie';
 
 export default function Header(){
     const {setUserInfo, userInfo} = useContext(UserContext);
-    useEffect(()=>{
-        fetch('https://t-bsp-api.vercel.app/profile', {
-            credentials: 'include',
-        }).then(response =>{
-            response.json().then(userInfo=>{
-                setUserInfo(userInfo);
-            })
-        })
-    },[])
+    useEffect(() => {
+      const token = Cookies.get('token');
+  
+      if (!token) {
+          return;
+      }
+  
+      fetch('https://t-bsp-api.vercel.app/profile', {
+          credentials: 'include',
+      })
+      .then(response => response.json())
+      .then(userInfo => setUserInfo(userInfo))
+      .catch(error => {
+          console.error('Error fetching profile:', error);
+          // Handle the error as needed
+      });
+  }, []);
 
     function logout(){
         fetch("https://t-bsp-api.vercel.app/logout", {
