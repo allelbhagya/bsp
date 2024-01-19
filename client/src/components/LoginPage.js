@@ -7,28 +7,27 @@ export default function LoginPage(){
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
     const {setUserInfo} = useContext(UserContext);
-    async function login(ev) {
-        ev.preventDefault();
-        try {
-            const response = await fetch('https://t-bsp-api.vercel.app/login', {
-                method: 'POST',
-                body: JSON.stringify({ username, password }),
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include', // Ensure you include credentials
-              });              
+// For example, in your login function:
+async function login(ev) {
+    ev.preventDefault();
+    const response = await fetch('https://t-bsp-api.vercel.app/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+  
+    if (response.ok) {
+      response.json().then((userInfo) => {
+        setUserInfo(userInfo);
+        setRedirect(true);
+        console.log('User logged in successfully:', userInfo);
+      });
+    } else {
+      alert('Wrong credentials');
+    }
+  }
     
-            if (response.ok) {
-                const userInfo = await response.json();
-                setUserInfo(userInfo);
-                setRedirect(true);
-            } else {
-                alert("Wrong credentials");
-            }
-        } catch (error) {
-            console.error("Error during login:", error);
-            alert("An error occurred during login.");
-        }
-    }    
     if(redirect){
         return <Navigate to={"/"}/>
     }
