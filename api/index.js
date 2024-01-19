@@ -14,12 +14,19 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = "qddi10eu90ikj1wqmn";
 
-const allowedOrigins = ['https://t-bsp-client.vercel.app/', 'https://t-bsp-client-r00fzvbb4-allelbhagya.vercel.app'];
+const allowedOrigins = ['https://t-bsp-client.vercel.app', 'https://t-bsp-client-r00fzvbb4-allelbhagya.vercel.app'];
 
 app.use(cors({
     methods: ["POST", "GET", "DELETE", "PUT"],
     credentials: true,
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // Check if the origin is in the allowedOrigins array or if it's undefined (e.g., for same-origin requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
   }));
 
 app.use(express.json());
