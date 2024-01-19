@@ -44,75 +44,61 @@ app.post('/register', async(req,res)=>{
     } 
 })
 
-app.post('/login', async(req,res)=>{
-    const {username, password} = req.body;
-    const userDoc = await User.findOne({username});
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    const userDoc = await User.findOne({ username });
     const passOk = bcrypt.compareSync(password, userDoc.password);
-    if(passOk){
-        //logged in
-        jwt.sign({username, id:userDoc._id }, secret, {}, (err, token)=>{
-            if(err) throw err;
-            res.cookie('token', token).json({
-                id:userDoc._id,
-                username,
-            });
+    if (passOk) {
+      // logged in
+      jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+        if (err) throw err;
+        res.cookie('token', token, { httpOnly: true }).json({
+          id: userDoc._id,
+          username,
         });
-        //res.json();
+        console.log('Token set:', token);
+      });
+    } else {
+      res.status(400).json('wrong credentials');
     }
-    else{
-        res.status(400).json('wrong credentials');
-    }
-})
+  });
 
 app.get('/profile', (req, res) => {
     const { token } = req.cookies;
-
     if (!token) {
-        return res.status(401).json({ error: 'Unauthorized - Token missing' });
+      return res.status(401).json({ error: 'Unauthorized - No token found' });
     }
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) {
-            console.error('JWT Verification Error:', err);
-            return res.status(401).json({ error: 'Unauthorized - Invalid token' });
-        }
-
-        res.json(info);
+      if (err) {
+        return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      }
+      res.json(info);
     });
-});
-
+  });
 
 app.post('/logout', (req,res)=>{
     res.cookie('token', '').json('ok');
 })
 
-app.post('/log', upload.none(), async(req, res) => {
+app.post('/log', upload.none(), async (req, res) => {
     const {token} = req.cookies;
-
-    jwt.verify(token, secret, {}, async(err, info) => {
-        if (err) {
-            return res.status(401).json({ error: 'Unauthorized - Invalid token' });
-        }
-
-        const {createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
-        const logCreatedAt = createdAt || new Date().toISOString();
-
-        const logDoc = await Logs.create({
-            createdAt: logCreatedAt,
-            time,
-            duration, 
-            region, 
-            sensorID, 
-            stoppage, 
-            profile, 
-            comment, 
-            measure,
-            author:info.id,
-        });
-
-        res.json(logDoc);
+    jwt.verify(token, secret, {}, async (err,info) => {
+    if (err) throw err;
+    const { time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
+    const logDoc = await Logs.create({
+      time,
+      duration,
+      region,
+      sensorID,
+      stoppage,
+      profile,
+      comment,
+      measure,
+      author: info.id,
     });
-});
-
+    res.json(logDoc);
+  });
+  });
 
 app.get('/log', async(req,res)=>{
     res.json(
