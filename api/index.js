@@ -21,21 +21,32 @@ const allowedOrigins = [
   'https://t-bsp-client-git-main-allelbhagya.vercel.app',
 ];
 
-app.use(cors({
-  credentials: true,
-  origin: allowedOrigins,
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(
-  expressSession({
+  session({
+    store: MongoStore.create({
+      mongoUrl: 'mongodb://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority',
+    }),
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 mongoose.connect('mongodb+srv://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority');
 
@@ -93,26 +104,15 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const ensureAuthenticated = (req, res, next) => {
-  const token = req.cookies.token;
-
-  if (token) {
-    jwt.verify(token, secret, (err, decoded) => {
-      if (err) {
-        res.status(401).json({ error: 'Unauthorized' });
-      } else {
-        req.user = decoded;
-        next();
-      }
-    });
+  if (req.isAuthenticated()) {
+    return next(); // User is authenticated, continue to the next middleware or route handler
   } else {
-    res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: 'Unauthorized' }); // User is not authenticated, return 401 Unauthorized
   }
 };
 
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
-  const token = jwt.sign({ id: req.user._id, username: req.user.username }, secret);
-  res.cookie('token', token, { httpOnly: true });
   res.json({ id: req.user._id, username: req.user.username });
 });
 
@@ -124,8 +124,6 @@ app.post('/logout', (req, res) => {
     }
     // Clear the session data
     req.session.destroy();
-    // Clear the token cookie
-    res.clearCookie('token');
     // Send a successful response
     res.json({ message: 'Logged out successfully' });
   });
@@ -134,7 +132,6 @@ app.post('/logout', (req, res) => {
 app.get('/profile', ensureAuthenticated, (req, res) => {
   res.json({ id: req.user._id, username: req.user.username });
 });
-
 
 app.post('/log', upload.none(), ensureAuthenticated, async (req, res) => {
   try {
