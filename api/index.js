@@ -1,16 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const User = require('./models/User');
-const Logs = require('./models/Logs');
-const bcrypt = require('bcryptjs');
+const session = require('express-session');
+const MongoStore = require('express-session-mongo');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const multer = require('multer');
 const upload = multer();
 const cookieParser = require('cookie-parser');
-const expressSession = require('express-session');
-const jwt = require('jsonwebtoken'); // Import JWT
+const User = require('./models/User');
+const Logs = require('./models/Logs');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 
