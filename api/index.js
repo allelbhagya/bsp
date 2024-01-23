@@ -87,12 +87,17 @@ passport.deserializeUser(async (id, done) => {
 
 // Middleware to ensure that the user is authenticated
 const ensureAuthenticated = (req, res, next) => {
+  console.log("Checking authentication...");
+
   if (req.isAuthenticated()) {
+    console.log("User is authenticated. Proceeding to the next middleware or route handler.");
     return next(); // User is authenticated, continue to the next middleware or route handler
   } else {
+    console.log("User is not authenticated. Sending 401 Unauthorized.");
     res.status(401).json({ error: 'Unauthorized' }); // User is not authenticated, return 401 Unauthorized
   }
 };
+
 
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
