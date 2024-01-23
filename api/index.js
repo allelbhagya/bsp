@@ -17,7 +17,7 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
-app.use(cors({ credentials: true, origin: 'https://t-bsp-client.vercel.app' }));
+app.use(cors({ credentials: true, origin: 'https://t-bsp-client-sq0syn2ve-allelbhagya.vercel.app' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(
