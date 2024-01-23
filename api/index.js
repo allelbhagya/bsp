@@ -25,6 +25,7 @@ app.use(
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
+    cookie: { secure: true }, // Add this line to ensure cookies are sent only over HTTPS
   })
 );
 app.use(passport.initialize());
@@ -103,10 +104,25 @@ const ensureAuthenticated = (req, res, next) => {
 
 
 
-app.post('/login', passport.authenticate('local'), (req, res) => {
-  const token = jwt.sign({ id: req.user._id, username: req.user.username }, secret);
-  res.cookie('token', token, { httpOnly: true });
-  res.json({ id: req.user._id, username: req.user.username });
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ message: 'Authentication failed' });
+    }
+
+    req.login(user, (loginErr) => {
+      if (loginErr) {
+        return next(loginErr);
+      }
+
+      const token = jwt.sign({ id: user._id, username: user.username }, secret);
+      res.cookie('token', token, { httpOnly: true });
+      res.json({ id: user._id, username: user.username });
+    });
+  })(req, res, next);
 });
 
 app.post('/logout', (req, res) => {
