@@ -8,32 +8,33 @@ export default function Header() {
   const location = useLocation();
 
   useEffect(() => {
+    // Define an asynchronous function to fetch user profile
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch("https://t-bsp-api.vercel.app/profile", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const contentType = response.headers.get("content-type");
+
+          if (contentType && contentType.includes("application/json")) {
+            const fetchedUserInfo = await response.json();
+            setUserInfo(fetchedUserInfo);
+          } else {
+            console.error("Unexpected response content type:", contentType);
+          }
+        } else {
+          console.error("Error fetching user profile:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Network error during profile fetch:", error);
+      }
+    };
+
     // Check if user is authenticated before making the request
     if (userInfo && location.pathname !== "/") {
-      fetch("https://t-bsp-api.vercel.app/profile", {
-        credentials: "include",
-      })
-        .then((response) => {
-          if (response.ok) {
-            const contentType = response.headers.get("content-type");
-
-            if (contentType && contentType.includes("application/json")) {
-              return response.json();
-            } else {
-              console.error("Unexpected response content type:", contentType);
-              return {};
-            }
-          } else {
-            console.error("Error fetching user profile:", response.statusText);
-            throw new Error("Error fetching user profile");
-          }
-        })
-        .then((fetchedUserInfo) => {
-          setUserInfo(fetchedUserInfo);
-        })
-        .catch((error) => {
-          console.error("Network error during profile fetch:", error);
-        });
+      fetchUserProfile();
     }
   }, [userInfo, setUserInfo, location]);
 

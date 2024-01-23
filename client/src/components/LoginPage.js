@@ -25,7 +25,7 @@ export default function LoginPage() {
       alert('Wrong credentials');
     }
   }
-
+  
   if (redirect) {
     return <Navigate to={"/logs"} />;
   }
