@@ -145,33 +145,31 @@ app.get('/profile', (req, res) => {
 });
 
 app.post('/log', upload.none(), async (req, res) => {
-  if (req.isAuthenticated()) {
-    try {
-      const { createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
-      const logCreatedAt = createdAt || new Date().toISOString();
+  try {
+    const { createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
+    const logCreatedAt = createdAt || new Date().toISOString();
 
-      const logDoc = await Logs.create({
-        createdAt: logCreatedAt,
-        time,
-        duration,
-        region,
-        sensorID,
-        stoppage,
-        profile,
-        comment,
-        measure,
-        author,
-      });
+    const logDoc = await Logs.create({
+      createdAt: logCreatedAt,
+      time,
+      duration,
+      region,
+      sensorID,
+      stoppage,
+      profile,
+      comment,
+      measure,
+      // Assuming author is the username, modify this accordingly based on your schema
+      author: req.isAuthenticated() ? req.user.username : 'Anonymous',
+    });
 
-      res.json(logDoc);
-    } catch (error) {
-      console.error('Error creating log:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  } else {
-    res.status(401).json({ error: 'Unauthorized' });
+    res.json(logDoc);
+  } catch (error) {
+    console.error('Error creating log:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
