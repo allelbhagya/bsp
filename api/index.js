@@ -25,7 +25,7 @@ app.use(
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true }, // Add this line to ensure cookies are sent only over HTTPS
+    cookie: { secure: true, sameSite: 'none' }, // Adjusted to ensure proper cookie handling
   })
 );
 app.use(passport.initialize());
@@ -86,7 +86,6 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Middleware to ensure that the user is authenticated
 const ensureAuthenticated = (req, res, next) => {
   console.log("Checking authentication...");
   console.log("Session:", req.session);
@@ -100,9 +99,6 @@ const ensureAuthenticated = (req, res, next) => {
     res.status(401).json({ error: 'Unauthorized' }); // User is not authenticated, return 401 Unauthorized
   }
 };
-
-
-
 
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
