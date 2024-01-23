@@ -174,6 +174,7 @@ app.post('/log', upload.none(), async (req, res) => {
 });
 
 
+
 app.get('/log', async (req, res) => {
   res.json(
     await Logs.find()

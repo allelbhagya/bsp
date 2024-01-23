@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import Select from "react-select"; 
+import React, { useContext } from 'react';
 
 export default function CreateLog() {
   const [times, setTimes] = useState('');
@@ -16,6 +17,7 @@ export default function CreateLog() {
   const [sensorOptions, setSensorOptions] = useState([]);
   const [redirect, setRedirect] = useState(false);
   const [createdAtTimestamp, setCreatedAtTimestamp] = useState('');
+  const { userInfo } = useContext(UserContext);
 
   const handleEndTimeChange = (ev) => {
     const endTime = new Date(ev.target.value);
@@ -93,25 +95,41 @@ export default function CreateLog() {
   };
 
   async function createNewLog(ev) {
-    const data = new FormData();
-    data.set('createdAt', createdAtTimestamp); 
-    data.set('time', times);
-    data.set('duration', duration);
-    data.set('region', JSON.stringify(selectedRegions));
-    data.set('sensorID', JSON.stringify(selectedSensors.map(sensor => sensor.value)));
-    data.set('stoppage', JSON.stringify(selectedStoppages));
-    data.set('profile', prof);
-    data.set('comment', comms);
-    data.set('measure', mea);
     ev.preventDefault();
-    const response = await fetch('https://t-bsp-api.vercel.app/log', {
-      method: 'POST',
-      body: data,
-      credentials: 'include',
-    });
 
-    if (response.ok) {
-      setRedirect(true);
+    // Check if userInfo is available and has the necessary properties
+    if (userInfo && userInfo.username) {
+      const username = userInfo.username;
+
+      const data = new FormData();
+      data.set('createdAt', createdAtTimestamp);
+      data.set('time', times);
+      data.set('duration', duration);
+      data.set('region', JSON.stringify(selectedRegions));
+      data.set('sensorID', JSON.stringify(selectedSensors.map(sensor => sensor.value)));
+      data.set('stoppage', JSON.stringify(selectedStoppages));
+      data.set('profile', prof);
+      data.set('comment', comms);
+      data.set('measure', mea);
+      data.set('author', username); // Set the author's username
+
+      try {
+        const response = await fetch('https://t-bsp-api.vercel.app/log', {
+          method: 'POST',
+          body: data,
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          setRedirect(true);
+        } else {
+          console.error('Error creating log:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Network error during log creation:', error);
+      }
+    } else {
+      console.error('User information not available. User may not be logged in.');
     }
   }
 
