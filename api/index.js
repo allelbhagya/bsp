@@ -92,12 +92,20 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Middleware to ensure that the user is authenticated
 const ensureAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next(); // User is authenticated, continue to the next middleware or route handler
+  const token = req.cookies.token;
+
+  if (token) {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        res.status(401).json({ error: 'Unauthorized' });
+      } else {
+        req.user = decoded;
+        next();
+      }
+    });
   } else {
-    res.status(401).json({ error: 'Unauthorized' }); // User is not authenticated, return 401 Unauthorized
+    res.status(401).json({ error: 'Unauthorized' });
   }
 };
 
