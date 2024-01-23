@@ -17,14 +17,7 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
-const corsOptions = {
-  credentials: true,
-  origin: 'https://t-bsp-client-sq0syn2ve-allelbhagya.vercel.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  optionsSuccessStatus: 204,
-};
-
-app.use(cors(corsOptions));
+app.use(cors({ credentials: true, origin: 'https://t-bsp-client.vercel.app' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -37,12 +30,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-try {
-  await mongoose.connect('mongodb+srv://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority');
-  console.log('Connected to MongoDB');
-} catch (error) {
-  console.error('MongoDB connection error:', error);
-}
+mongoose.connect('mongodb+srv://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority');
 
 app.get('/', (req, res) => {
   res.send('Hello, this is the root endpoint!');
