@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 
 export default function Register(){
     const [username, setUsername] = useState('');
@@ -21,7 +22,7 @@ export default function Register(){
         <div>
 
             <form className="register" onSubmit={register}>
-            <h2>register</h2>
+            <h2>Register User</h2>
                 <input type="text" 
                 placeholder="username" 
                 value={username} 
@@ -30,7 +31,11 @@ export default function Register(){
                 placeholder="password"
                 value ={password}
                 onChange={ev=>setPassword(ev.target.value)} />
-                <button>register</button>
+                <button>Register</button>
+                <p>
+        <span>Already have an account? </span>
+        <Link to="/">Login</Link>
+      </p>
             </form>
         </div>
     )

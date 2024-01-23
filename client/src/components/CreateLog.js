@@ -20,12 +20,11 @@ export default function CreateLog() {
   const handleEndTimeChange = (ev) => {
     const endTime = new Date(ev.target.value);
     const currentTime = new Date();
-    const timeDifferenceInMinutes = Math.floor((endTime - currentTime) / (1000 * 60));
-
-    // Update the duration state with the calculated difference
-    setDuration(timeDifferenceInMinutes >= 0 ? timeDifferenceInMinutes : '');
+    const timeDifferenceInSeconds = Math.floor((endTime - currentTime) / 1000);
+  
+    setDuration(timeDifferenceInSeconds >= 0 ? timeDifferenceInSeconds : '');
     setTimes(ev.target.value);
-  };
+  };  
 
   useEffect(() => {
     const currentTimeStamp = new Date();
@@ -35,21 +34,16 @@ export default function CreateLog() {
         const response = await fetch('/sensor.csv');
         const csvData = await response.text();
   
-        console.log('CSV Data:', csvData); // Log CSV data to the console
+        console.log('CSV Data:', csvData); 
   
         const lines = csvData.split('\n');
         const options = lines.slice(1).map(line => {
           const [sensorID, tagName] = line.split(',');
   
-          // Log sensorID and tagName to identify any issues
           console.log('Raw sensorID:', sensorID);
           console.log('Raw tagName:', tagName);
-  
-          // Trim and handle cases where sensorID or tagName might be undefined
           const trimmedSensorID = sensorID ? sensorID.trim() : '';
           const trimmedTagName = tagName ? tagName.trim() : '';
-  
-          // Log trimmed values
           console.log('Trimmed sensorID:', trimmedSensorID);
           console.log('Trimmed tagName:', trimmedTagName);
   
@@ -63,7 +57,7 @@ export default function CreateLog() {
     };
   
     fetchSensorOptions();
-  }, []); // Empty dependency array to run the effect only once on component mount
+  }, []); 
   
 
   const regionOptions = [
@@ -122,7 +116,7 @@ export default function CreateLog() {
   }
 
   if (redirect) {
-    return <Navigate to={'/'} />;
+    return <Navigate to={'/logs'} />;
   }
   const currTime = new Date();
 
@@ -149,17 +143,20 @@ export default function CreateLog() {
 
 
     <label>End time</label>
-        <input
-          type="datetime-local"
-          value={times}
-          onChange={handleEndTimeChange}  // Use the new event handler
-        />
-        <label>Duration (in minutes)</label>
-        <input
-          type="number"
-          value={duration}
-          onChange={(ev) => setDuration(ev.target.value)}
-        />
+    <input
+      type="datetime-local"
+      value={times}
+      onChange={handleEndTimeChange}
+      step="1" 
+    />
+
+<label>Duration (in seconds)</label>
+<input
+  type="number"
+  value={duration}
+  onChange={(ev) => setDuration(ev.target.value)}
+/>
+
 
 
     <div className="table-options">
@@ -227,7 +224,7 @@ export default function CreateLog() {
         SensorID and Tag name
       </label>
       <Select
-        isMulti // Enable multi-select
+        isMulti // enable multi-select
         value={selectedSensors}
         options={sensorOptions.map(option => ({ value: option, label: option }))}
         onChange={selectedOptions => setSelectedSensors(selectedOptions)}

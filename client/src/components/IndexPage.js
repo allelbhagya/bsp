@@ -1,4 +1,4 @@
-// IndexPage.js
+
 import React, { useEffect, useState } from 'react';
 import Log from './Log';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,6 @@ export default function IndexPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const downloadCSV = () => {
-    // Prepare the CSV content
     const headers = [
       'Report time',
       'Cobble time',
@@ -43,10 +42,8 @@ export default function IndexPage() {
       }).join(',')),
     ].join('\n');
   
-    // Create a Blob containing the CSV data
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   
-    // Create a link element and trigger a download
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -57,41 +54,51 @@ export default function IndexPage() {
   };
   
   useEffect(() => {
-    fetch('https://t-bsp-api.vercel.app/log')
-      .then(response => response.json())
+    fetch('https://t-bsp-api.vercel.app/log', {
+      credentials: 'include', // Add this line
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching logs');
+        }
+        return response.json();
+      })
       .then(logs => {
         setLogs(logs);
       })
       .catch(error => {
-        console.error('Error fetching logs:', error);
+        console.error('Error fetching logs:', error.message);
+        // Handle the error, e.g., show an error message to the user or redirect to an error page
       });
   }, []);
-
-const handleDelete = async (logId) => {
-  const confirmed = window.confirm('Are you sure you want to delete this log?');
-
-  if (confirmed) {
-    try {
-      const response = await fetch(`https://t-bsp-api.vercel.app/log/${logId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        setLogs(prevLogs => prevLogs.filter(log => log._id !== logId));
-      } else {
-        console.error('Error deleting log:', response.statusText);
+  
+  
+  const handleDelete = async (logId) => {
+    const confirmed = window.confirm('Are you sure you want to delete this log?');
+  
+    if (confirmed) {
+      try {
+        const response = await fetch(`https://t-bsp-api.vercel.app/log/${logId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Add this line
+        });
+  
+        if (response.ok) {
+          setLogs(prevLogs => prevLogs.filter(log => log._id !== logId));
+        } else {
+          console.error('Error deleting log:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error deleting log:', error);
       }
-    } catch (error) {
-      console.error('Error deleting log:', error);
     }
-  }
-};
+  };
+  
 
 const handleEdit = (logId) => {
-  // Redirect to the edit page with the logId
   navigate(`/edit/${logId}`);
 };
 

@@ -1,4 +1,4 @@
-// EditLog.js
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -50,6 +50,7 @@ export default function EditLog() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Add this line
         body: JSON.stringify({
           time: times,
           duration: duration,
@@ -105,7 +106,7 @@ export default function EditLog() {
       };
       useEffect(() => {
         if (redirect) {
-          navigate('/'); // Navigate after the component has rendered
+          navigate('/logs');
         }
       }, [redirect, navigate]);
     
