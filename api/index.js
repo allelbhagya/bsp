@@ -137,34 +137,42 @@ app.post('/logout', (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
-  res.json({ id: req.user._id, username: req.user.username });
-});
-
-
-app.post('/log', upload.none(), async (req, res) => {
-  try {
-    const { createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
-    const logCreatedAt = createdAt || new Date().toISOString();
-
-    const logDoc = await Logs.create({
-      createdAt: logCreatedAt,
-      time,
-      duration,
-      region,
-      sensorID,
-      stoppage,
-      profile,
-      comment,
-      measure,
-      author: req.user._id,
-    });
-
-    res.json(logDoc);
-  } catch (error) {
-    console.error('Error creating log:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  if (req.isAuthenticated()) {
+    res.json({ id: req.user._id, username: req.user.username });
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
   }
 });
+
+app.post('/log', upload.none(), async (req, res) => {
+  if (req.isAuthenticated()) {
+    try {
+      const { createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
+      const logCreatedAt = createdAt || new Date().toISOString();
+
+      const logDoc = await Logs.create({
+        createdAt: logCreatedAt,
+        time,
+        duration,
+        region,
+        sensorID,
+        stoppage,
+        profile,
+        comment,
+        measure,
+        author: req.user._id,
+      });
+
+      res.json(logDoc);
+    } catch (error) {
+      console.error('Error creating log:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+});
+
 
 app.get('/log', async (req, res) => {
   res.json(
