@@ -35,8 +35,8 @@ app.use(cookieParser());
 
 app.use(
   session({
-    store: MongoStore.create({
-      mongoUrl: 'mongodb://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority',
+    store: new MongoStore({
+      url: 'mongodb://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority',
     }),
     secret: 'your-secret-key',
     resave: false,
@@ -46,7 +46,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 mongoose.connect('mongodb+srv://bsp:bsp@bsp.liemt4a.mongodb.net/?retryWrites=true&w=majority');
 
