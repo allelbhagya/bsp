@@ -19,7 +19,7 @@ const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
 const corsOptions = {
   credentials: true,
-  origin: 'https://t-bsp-client.vercel.app',
+  origin: 'https://t-bsp-client-sq0syn2ve-allelbhagya.vercel.app',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionsSuccessStatus: 204,
 };
