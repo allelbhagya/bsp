@@ -136,12 +136,12 @@ app.post('/logout', (req, res) => {
   });
 });
 
-app.get('/profile', ensureAuthenticated, (req, res) => {
+app.get('/profile', (req, res) => {
   res.json({ id: req.user._id, username: req.user.username });
 });
 
 
-app.post('/log', upload.none(), ensureAuthenticated, async (req, res) => {
+app.post('/log', upload.none(), async (req, res) => {
   try {
     const { createdAt, time, duration, region, sensorID, stoppage, profile, comment, measure } = req.body;
     const logCreatedAt = createdAt || new Date().toISOString();
@@ -166,7 +166,7 @@ app.post('/log', upload.none(), ensureAuthenticated, async (req, res) => {
   }
 });
 
-app.get('/log', ensureAuthenticated, async (req, res) => {
+app.get('/log', async (req, res) => {
   res.json(
     await Logs.find()
       .populate('author', ['username'])
@@ -174,7 +174,7 @@ app.get('/log', ensureAuthenticated, async (req, res) => {
   );
 });
 
-app.delete('/log/:id', ensureAuthenticated, async (req, res) => {
+app.delete('/log/:id',async (req, res) => {
   const logId = req.params.id;
   try {
     const deletedLog = await Logs.findByIdAndDelete(logId);
@@ -190,7 +190,7 @@ app.delete('/log/:id', ensureAuthenticated, async (req, res) => {
   }
 });
 
-app.get('/log/:id', ensureAuthenticated, async (req, res) => {
+app.get('/log/:id', async (req, res) => {
   try {
     const log = await Logs.findById(req.params.id);
     res.json(log);
@@ -199,7 +199,7 @@ app.get('/log/:id', ensureAuthenticated, async (req, res) => {
   }
 });
 
-app.put('/log/:id', ensureAuthenticated, async (req, res) => {
+app.put('/log/:id', async (req, res) => {
   const logId = req.params.id;
   const updatedLog = req.body;
 
