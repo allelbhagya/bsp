@@ -160,7 +160,7 @@ app.post('/log', upload.none(), async (req, res) => {
         profile,
         comment,
         measure,
-        author: req.user._id,
+        author,
       });
 
       res.json(logDoc);

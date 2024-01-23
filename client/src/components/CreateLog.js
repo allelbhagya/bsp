@@ -18,7 +18,7 @@ export default function CreateLog() {
   const [sensorOptions, setSensorOptions] = useState([]);
   const [redirect, setRedirect] = useState(false);
   const [createdAtTimestamp, setCreatedAtTimestamp] = useState('');
-  const { userInfo } = useContext(UserContext);
+  const { setUserInfo, userInfo } = useContext(UserContext);
 
   const handleEndTimeChange = (ev) => {
     const endTime = new Date(ev.target.value);
@@ -97,9 +97,7 @@ export default function CreateLog() {
 
   async function createNewLog(ev) {
     ev.preventDefault();
-
-    // Check if userInfo is available and has the necessary properties
-    if (userInfo && userInfo.username) {
+    if (userInfo.username) {
       const username = userInfo.username;
 
       const data = new FormData();
